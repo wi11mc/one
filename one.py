@@ -12,7 +12,6 @@ class TextEditor(tk.Tk):
 
         self.menu_bar = tk.Menu(self)
 
-        # File menu
         file_menu = tk.Menu(self.menu_bar, tearoff=0)
         file_menu.add_command(label="New", command=self.new_file)
         file_menu.add_command(label="Open", command=self.open_file)
@@ -21,7 +20,6 @@ class TextEditor(tk.Tk):
         file_menu.add_command(label="Exit", command=self.quit)
         self.menu_bar.add_cascade(label="File", menu=file_menu)
 
-        # Edit menu
         edit_menu = tk.Menu(self.menu_bar, tearoff=0)
         edit_menu.add_command(label="Cut", command=self.cut_text)
         edit_menu.add_command(label="Copy", command=self.copy_text)
