@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+import keyword
 
 class TextEditor(tk.Tk):
     def __init__(self):
@@ -10,6 +11,7 @@ class TextEditor(tk.Tk):
         self.text_area = tk.Text(self, wrap='word', bg="#1e1e1e", fg="white", insertbackground="white", selectbackground="blue")
         self.text_area.pack(fill='both', expand=True)
         self.text_area.bind('<Key>', self.update_status_bar)
+        self.text_area.bind('<KeyRelease>', self.highlight_syntax)
 
         self.status_bar = tk.Label(self, text="", bd=1, relief=tk.SUNKEN, anchor=tk.W)
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
@@ -78,7 +80,29 @@ class TextEditor(tk.Tk):
         status_text = f"{cursor_pos_str} | Word Count: {word_count} | Character Count: {char_count}"
         self.status_bar.config(text=status_text)
 
+    def highlight_syntax(self, event=None):
+        self.text_area.tag_remove("keyword", "1.0", tk.END)
+        self.text_area.tag_remove("builtin", "1.0", tk.END)
+        self.text_area.tag_remove("definition", "1.0", tk.END)
+        text = self.text_area.get("1.0", "end-1c")
+        for word in text.split():
+            if keyword.iskeyword(word):
+                self.highlight_word("keyword", word, "orange")
+            elif word in dir(__builtins__):
+                self.highlight_word("builtin", word, "lightgreen")
+            elif word.startswith("def") or word.startswith("class"):
+                self.highlight_word("definition", word, "cyan")
+
+    def highlight_word(self, tag, word, color):
+        start = "1.0"
+        while True:
+            pos = self.text_area.search(word, start, tk.END)
+            if not pos:
+                break
+            start = pos + "+%dc" % len(word)
+            self.text_area.tag_add(tag, pos, start)
+            self.text_area.tag_config(tag, foreground=color)
+
 if __name__ == "__main__":
     app = TextEditor()
     app.mainloop()
-    
